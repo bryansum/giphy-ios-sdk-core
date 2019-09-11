@@ -51,10 +51,15 @@ public extension GPHMappable {
     
     static func parseDate(_ date: String?, format: String) -> Date? {
         guard let date = date else { return nil }
-        let dateFormatter = DateFormatter.standardDateFormatter
-        dateFormatter.timeZone = TimeZone(abbreviation: "UTC") ?? TimeZone.current
-        dateFormatter.dateFormat = format
-        return dateFormatter.date(from: date)
+
+       var formattedDate: Date?
+       DateFormatter.standardDateFormatterQueue.sync {
+          let dateFormatter = DateFormatter.standardDateFormatter
+          dateFormatter.timeZone = TimeZone(abbreviation: "UTC") ?? TimeZone.current
+          dateFormatter.dateFormat = format
+          formattedDate = dateFormatter.date(from: date)
+       }
+       return formattedDate
     }
 
     /// Map a String to a URL.
@@ -113,6 +118,7 @@ public extension GPHMappable {
 /// Create a more performant static instance of DateFormatter
 
 extension DateFormatter {
+    fileprivate static let standardDateFormatterQueue = DispatchQueue(label: "standardDateFormatterQueue")
     fileprivate static let standardDateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         return dateFormatter
