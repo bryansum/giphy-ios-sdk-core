@@ -181,7 +181,7 @@ import Foundation
             #endif
 
             do {
-                guard let data = data else {
+                guard let data = data, data.count > 0 else {
                     self.failedRequest(retry: true, data: nil, response: response, error:GPHJSONMappingError(description: "Can not map API response to JSON, there is no data"))
                     return
                 }
